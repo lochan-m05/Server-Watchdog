@@ -31,6 +31,3 @@ Edit config.json to set server endpoints, alert thresholds, notification options
 
 Contributing:
 Feel free to submit issues, feature requests, or pull requests.
-
-License:
-MIT (see LICENSE file)
