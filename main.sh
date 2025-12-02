@@ -1,6 +1,6 @@
 #!/bin/bash/
 
-THRESHOLD=1
+THRESHOLD=80
 WEBHOOK_URL="nigga"
 
 
@@ -8,28 +8,23 @@ WEBHOOK_URL="nigga"
 send_discord_alert() {
     local message="$1"
     
-    # 1. Dependency Check
+ 
     if ! command -v jq &> /dev/null; then
         echo "Error: 'jq' is not installed. Cannot construct safe JSON." >&2
         return 1
     fi
 
-    # 2. Variable Check
+
     if [[ -z "$WEBHOOK_URL" ]]; then
         echo "Error: WEBHOOK_URL variable is empty." >&2
         return 1
     fi
 
-    # 3. Construct Safe JSON
-    # -n: New object
-    # --arg: Safely passes $message as a variable named $content
+  
     local payload
     payload=$(jq -n --arg content "$message" '{content: $content}')
 
-    # 4. Send and Capture HTTP Code
-    # -s: Silent (no progress bar)
-    # -o /dev/null: Throw away the response body
-    # -w "%{http_code}": Print only the HTTP status code (e.g., 204)
+  
     local status_code
     status_code=$(curl -s -o /dev/null -w "%{http_code}" \
         -H "Content-Type: application/json" \
@@ -37,8 +32,7 @@ send_discord_alert() {
         -d "$payload" \
         "$WEBHOOK_URL")
 
-    # 5. Validate Success
-    # Discord returns 204 (No Content) on success, or 200.
+
     if [[ "$status_code" -eq 204 || "$status_code" -eq 200 ]]; then
         return 0
     else
