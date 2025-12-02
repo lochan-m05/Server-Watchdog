@@ -1,17 +1,50 @@
 #!/bin/bash/
 
 THRESHOLD=1
-WEBHOOK_URL="https://discord.com/api/webhooks/1445009226480222363/NTPINv1HAGQId8unXSpal6SgCl6HQHFA-zxf5lbY6lJTTSUZWCmWOxSzzvjA4PREsLe-"
-
+WEBHOOK_URL="nigga"
 
 
 
 send_discord_alert() {
     local message="$1"
-       curl -H "Content-Type: application/json" \
-         -X POST \
-         -d "{\"content\": \"$message\"}" \
-         "$WEBHOOK_URL" > /dev/null 2>&1
+    
+    # 1. Dependency Check
+    if ! command -v jq &> /dev/null; then
+        echo "Error: 'jq' is not installed. Cannot construct safe JSON." >&2
+        return 1
+    fi
+
+    # 2. Variable Check
+    if [[ -z "$WEBHOOK_URL" ]]; then
+        echo "Error: WEBHOOK_URL variable is empty." >&2
+        return 1
+    fi
+
+    # 3. Construct Safe JSON
+    # -n: New object
+    # --arg: Safely passes $message as a variable named $content
+    local payload
+    payload=$(jq -n --arg content "$message" '{content: $content}')
+
+    # 4. Send and Capture HTTP Code
+    # -s: Silent (no progress bar)
+    # -o /dev/null: Throw away the response body
+    # -w "%{http_code}": Print only the HTTP status code (e.g., 204)
+    local status_code
+    status_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d "$payload" \
+        "$WEBHOOK_URL")
+
+    # 5. Validate Success
+    # Discord returns 204 (No Content) on success, or 200.
+    if [[ "$status_code" -eq 204 || "$status_code" -eq 200 ]]; then
+        return 0
+    else
+        echo "Error: Failed to send Discord alert. Server returned: $status_code" >&2
+        return 1
+    fi
 }
 
 echo "---------------------------------"
