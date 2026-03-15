@@ -1,11 +1,20 @@
+FROM python:3.9-slim
 
-FROM alpine:3.14
+RUN apt-get update && apt-get install -y \
+    bash \
+    jq \
+    curl \
+    procps \
+    util-linux \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /home/Watchdog
+WORKDIR /app
 
-RUN apk add --no-cache bash jq curl util-linux procps
+COPY . /app
 
-COPY . /home/Watchdog
-RUN chmod +x main.sh
+RUN pip install --no-cache-dir fastapi uvicorn
 
-CCMD ["bash", "maih.sh"]
+RUN chmod +x main.sh main.py
+
+EXPOSE 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
