@@ -134,8 +134,6 @@ Example `/api/health` response:
 
 The dashboard auto‑refreshes every 5 seconds. Metrics that exceed the threshold are highlighted in red.
 
-![Dashboard Screenshot](screenshot.png) *(Add a screenshot if you like)*
-
 ## Advanced Configuration
 
 ### Using Environment Variables for Discord Webhook
@@ -184,10 +182,6 @@ Open browser developer tools (F12) and check the network tab for the `/api/healt
 - Verify the webhook URL is correct.
 - Ensure `curl` is installed.
 - If using the environment variable, confirm it is passed correctly.
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
